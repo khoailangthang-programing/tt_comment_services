@@ -6,7 +6,7 @@
  */
 
 module.exports = {
-
+  connection: 'mysqlThapThanhCoreDev',
   attributes: {
   	cid: {
   		type: "integer",
@@ -61,16 +61,6 @@ module.exports = {
   		type: "integer",
   		required: true,
   	},
-  	comments: {
-  		collection: "comment_new",
-  		via: "comment"
-  	},
-  	comment: {
-  		model: "comment_new"
-  	},
-  	users: {
-  		model: "users"
-  	}
   }
 };
 

@@ -6,7 +6,7 @@
  */
 
 module.exports = {
-
+  connection: 'mysqlThapThanhCoreDev',
   attributes: {
   	guid: {
   		type: "integer",

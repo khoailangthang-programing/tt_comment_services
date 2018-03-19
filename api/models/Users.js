@@ -6,37 +6,52 @@
  */
 
 module.exports = {
-
+  connection: 'mysqlTamTayIdsDev',
   attributes: {
   	uid: {
-  		type: "integer",
-  		primaryKey: true,
-  		autoIncrement: false,
-  		unique: true
-  	},
-  	name: {
-  		type: "string",
-  		required: true
-  	},
-  	email: {
-  		type: "string",
-  		size: 100,
-  		required: true
-  	},
-  	avatar: {
-  		type: "string",
-  		required: false,
-  		defaultsTo: null
-  	},
-  	created: {
-  		type: "integer",
-  		required: true,
-  		defaultsTo: 0
-  	},
-  	comments: {
-  		collection: "comment_new",
-  		via: "users"
-  	}
+      type: "integer",
+      primaryKey: true,
+      autoIncrement: true,
+      unique: true
+    },
+    name: {
+      type: "string",
+      required: false
+    },
+    pass: {
+      type: "string",
+      required: false
+    },
+    mail: {
+      type: "string",
+      required: false
+    },
+    mode: {
+      type: "integer",
+      required: false,
+      defaultsTo: null
+    },
+    sort: {
+      type: "integer",
+      required: false,
+      defaultsTo: null
+    },
+    threshold: {
+      type: "integer",
+      required: true,
+      defaultsTo: null
+    },
+    theme: {
+      type: "string",
+      required: false,
+      defaultsTo: null
+    },
+    signature: {
+      type: "string",
+      required: false,
+      defaultsTo: null
+    }
+    //dai qua a oi
   }
 };
 
