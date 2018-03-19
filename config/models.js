@@ -1,8 +1,7 @@
 
 module.exports.models = {
 
-  connection: 'mysqlThapThanhCoreDev', // by default connection
-  connection: 'mysqlTamTayIdsDev',
+  connection: ['mysqlThapThanhCoreDev', 'mysqlTamTayIdsDev'],
   migrate: 'safe', // alter
   schema: true,
   autoUpdatedAt: false,
