@@ -1,3 +1,6 @@
+var validator = require('validator');
+var htmlEntities = require('he');
+
 module.exports = {
 	create: function (req, res) {
 		var response = {
@@ -296,6 +299,90 @@ module.exports = {
 			if(err) throw err;
 			console.log(result);
 		})
-	}
+	},
+
+	list: function (req, res) {
+		var response = {
+			status: 0,
+			messages: []
+		};
+		var checkPage = validator.isInt(req.param("page"), { min: 1, max: 99 });
+		var getCommentsList = new Promise(function(resolve, reject) {
+			if (checkPage != true) {
+					response.messages.push("Page is not integer or greater than 0");
+					reject(1);
+					return;
+				}
+				var filter = {};
+				if (req.query.filter.hasOwnProperty("nid")) {
+					filter.nid = req.query.filter.nid;
+				} else if (req.query.filter.hasOwnProperty("aid")) {
+					filter.aid = req.query.filter.aid;
+				} else {
+					response.messages.push("nid or aid is missing.");
+				}
+				filter.reply_to = 0;
+				filter.status = 1;
+				
+				if (!req.query.page) {
+					req.query.page = 1;
+				}
+				Comment_new.find(filter, {order: "changed DESC", limit: 10, page: req.query.page}, function(error, result) {
+					if (error) {
+						reject(error);
+						return;
+					}
+					resolve(result);
+				});
+		});
+		var sendJson = function () {
+			getCommentsList.then(function (comments) {
+				var commentIdList = [];
+				response.items = comments;
+				for (var i = 0; i < comments.length; i++) {
+					if (commentIdList.indexOf(comments[i].cid) < 0) {
+						commentIdList.push(comments[i].cid);
+					}
+					response.items[i].subcomments = [];
+					response.items[i].created = TimeService.readableTime(comments[i].created);
+					response.items[i].content = htmlEntities.decode(comments[i].content);
+				}
+				if (commentIdList.length == 0) {
+					response.status = 1;
+					res.json(response);
+					return;
+				}
+				Comment_new.find({reply_to: commentIdList, status: 1}, {}, function(error, result) {
+					if (error) {
+						reject(error);
+						return;
+					}
+					for (var m = 0; m < result.length; m++) {
+						result[m].created = TimeService.readableTime(result[m].created);
+						result[m].content = htmlEntities.decode(result[m].content);
+						result[m].nid = req.query.filter.nid ? req.query.filter.nid : req.query.filter.aid;
+						result[m].username = result[m].uname;
+						var index = response.items.findIndex(function(element) {
+							if (element.cid == result[m].reply_to) {
+								return true;
+							}
+							return false;
+						});
+						response.items[index].subcomments.push(result[m]);
+					}
+					response.status = 1;
+					res.json(response);
+				});
+			})
+			.catch(function (error) {
+				if (error && error.hasOwnProperty("code")) {
+					return next(error);
+				}
+				res.json(response);
+			});
+		};
+
+		sendJson();
+	},
 };
 
