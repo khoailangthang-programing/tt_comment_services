@@ -1,6 +1,9 @@
 
 module.exports.routes = {
-  'GET /': 'IndexController.index',
-  'GET /users': 'IndexController.testModel',
-  'GET /populate': 'IndexController.testPopulate'
+  'get /': 'IndexController.index',
+  'get /users': 'IndexController.testModel',
+  'get /populate': 'IndexController.testPopulate',
+  'post /comments/create': 'CommentsController.create',
+  'post /comments/update': 'CommentsController.update',
+  '/comments/test': 'CommentsController.test'
 };

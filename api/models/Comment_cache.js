@@ -12,7 +12,6 @@ module.exports = {
   		type: "integer",
   		size: 64,
   		primaryKey: true,
-  		autoIncrement: true,
   		unique: true
   	},
   	count: {
