@@ -24,7 +24,7 @@ module.exports = {
       required: false
     }
   },
-  find : function(filter, options, callback) {
+  getEmoji : function(filter, options, callback) {
     var condition = "";
     var bind = [];
     for (prop in filter) {

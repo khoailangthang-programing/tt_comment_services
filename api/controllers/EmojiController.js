@@ -4,7 +4,7 @@ module.exports = {
 			status: 0,
 			messages: []
 		};
-		Emoji.find({}, {}, function(error, result) {
+		Emoji.getEmoji({}, {}, function(error, result) {
 			if (error) {
 				res.json(400, {message: 'Error !'});
 			}

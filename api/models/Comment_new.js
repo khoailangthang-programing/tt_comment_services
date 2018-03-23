@@ -64,7 +64,7 @@ module.exports = {
   		required: true,
   	}
   },
-  find: function(filter, options, callback) {
+  getComment: function(filter, options, callback) {
         var app = this;
         var condition = "";
         var bind = [];

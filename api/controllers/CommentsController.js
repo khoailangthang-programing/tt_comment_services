@@ -327,7 +327,7 @@ module.exports = {
 				if (!req.query.page) {
 					req.query.page = 1;
 				}
-				Comment_new.find(filter, {order: "changed DESC", limit: 10, page: req.query.page}, function(error, result) {
+				Comment_new.getComment(filter, {order: "changed DESC", limit: 10, page: req.query.page}, function(error, result) {
 					if (error) {
 						reject(error);
 						return;
@@ -352,7 +352,7 @@ module.exports = {
 					res.json(response);
 					return;
 				}
-				Comment_new.find({reply_to: commentIdList, status: 1}, {}, function(error, result) {
+				Comment_new.getComment({reply_to: commentIdList, status: 1}, {}, function(error, result) {
 					if (error) {
 						reject(error);
 						return;
