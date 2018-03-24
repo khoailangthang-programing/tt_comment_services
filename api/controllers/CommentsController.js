@@ -9,15 +9,27 @@ module.exports = {
 			data:    [{}]
 		}
 		var fields = {};
+		var flag_join = {};
 
 		if(req.method != "POST") {
 			response.message.push("Bad request. Return 400 !");
 			return res.json(400, response);
 		}
 		var nid = req.validate({"nid": "numeric"}, false);
-		if(!nid) {
-			response.message.push("Newsid dosenot exist. Ignore request");
+		var aid = req.validate({"aid": "numeric"}, false);
+		if(!nid && !aid) {
+			response.message.push("Newsid or Aid don't exist. Ignore request");
 			return res.json(400, response);
+		}
+		else {
+			if(!nid && aid) {
+				flag_join.col = "game";
+				flag_join.val = aid.aid;
+			}
+			else {
+				flag_join.col = "news";
+				flag_join.val = nid.nid;
+			}
 		}
 		var params = req.validate([
 			{"uid": "numeric"}, 
@@ -29,7 +41,7 @@ module.exports = {
 		], false);
 		if(!params) {
 			response.message.push("Invalid params. Ignore request");
-			return res.json(400, response)
+			return res.json(400, response);
 		}
 
 		var validParamsCase = new Promise(function (resolve, reject) {
@@ -65,13 +77,12 @@ module.exports = {
 				});
 			}
 		});
-
 		validParamsCase.then(function (validParams) {
 			// Insert to comment new
 			return new Promise(function (resolve, reject) {
 				fields.created = Math.floor((new Date()).getTime() / 1000);
 				fields.changed = Math.floor((new Date()).getTime() / 1000);
-				fields.content = params.content;
+				fields.content = htmlEntities.encode(params.content);
 				fields.status = 1;
 				fields.host = params.ip.split('.').reduce(function(ipInt, octet) {
 					return (ipInt<<8) + parseInt(octet, 10)
@@ -79,7 +90,7 @@ module.exports = {
 				Comment_new.create(fields).then(function (result) {
 					resolve(result);
 				}).catch(function (err) {
-					reject(err);
+					throw err;
 				});
 			});
 		}).then(function (createdComment) {
@@ -87,7 +98,6 @@ module.exports = {
 			var newCommentCache_Fields = {
 				lastest: []
 			};
-
 			var dataCreatedComment = { //init form(like old form) and data
 				cid: createdComment.cid,
 				uid: createdComment.uid,
@@ -103,6 +113,7 @@ module.exports = {
 				__isset_bit_vector: [1, 1, 1, 1, 1, 1, 1, 1],
 				optionals: ["CID"]
 			}
+			flag_join.join = createdComment.cid;
 			
 			return new Promise(function (resolve, reject) {
 				if(createdComment.reply_to == 0) {
@@ -111,7 +122,7 @@ module.exports = {
 					newCommentCache_Fields.count   = 0;
 					newCommentCache_Fields.lastest.push(dataCreatedComment);
 					newCommentCache_Fields.lastest = JSON.stringify(newCommentCache_Fields.lastest);
-					
+					// console.log(newCommentCache_Fields);
 					Comment_cache.create(newCommentCache_Fields).then(function (result) {
 						response.message.push("Comment id " + createdComment.cid + " was added by " + createdComment.uname);
 						response.data[0].comment_id = createdComment.cid;
@@ -119,7 +130,7 @@ module.exports = {
 						response.data[0].content    = createdComment.content;
 						resolve(result);
 					}).catch(function (err) {
-						reject(err);
+						throw err;
 					});
 				}
 				else {
@@ -145,23 +156,38 @@ module.exports = {
 								response.data[0].content = createdComment.content;
 								resolve(dataCreatedComment);
 							}).catch(function (err) {
-								reject("Update comment's content failed");
+								throw err;
 							});
 						} else {
-							reject("Undefined cache comment");
+							throw "Undefined cache comment";
 						}
 					}).catch(function (err) {
-						reject("Comment not found");
+						throw err;
 					});
 				}
 			});
 		}).then(function (createdCommentCache) {
-			// Resulting for created cache
-			console.log(createdCommentCache);
-			response.status = 1;
+			console.log(flag_join);
+			if(flag_join.col == "news") {
+				News_comment.create({cid: flag_join.join, nid: parseInt(flag_join.val)}).then(function (success) {
+					return Promise.resolve(1);
+				}).catch(function (err) {
+					throw err;
+				});
+			}
+			else if(flag_join.col == "game") {
+				Game_comment.create({cid: flag_join.join, aid: parseInt(flag_join.val)}).then(function (success) {
+					return Promise.resolve(1);
+				}).catch(function (err) {
+					throw err;
+				});
+			}
 			response.message.push("Cache was changed");
 			response.data[0].commentcache_id = createdCommentCache.guid;
 			response.data[0].commentcache_latest = createdCommentCache.lastest;
+		}).then(function (successful) {
+			response.status = 1;
+			response.message.push("Table join has been created");
 			return res.json(response);
 		}).catch(function (err) {
 			response.message.push(err);
@@ -205,7 +231,7 @@ module.exports = {
 				if(typeof foundComment != "undefined") {
 					let newFields = {};
 					newFields.changed = Math.floor((new Date()).getTime()/1000);
-					newFields.content = params.content;
+					newFields.content = htmlEntities.endcode(params.content);
 
 					Comment_new.update({cid: comment.cid}, newFields).then(function (wasUpdated) {
 						resolve(wasUpdated);
@@ -214,10 +240,10 @@ module.exports = {
 					});
 				}
 				else {
-					reject("Undefined comment");
+					throw "Undefined comment";
 				}
 			}).catch(function (err) {
-				reject("Comment not found");
+				throw err;
 			});
 		});
 		promiseUpdateComment.then(function (wasUpdated) {
@@ -244,13 +270,13 @@ module.exports = {
 							Comment_cache.update({guid: comment_id}, {lastest: JSON.stringify(lastestContent)}).then(function (successful) {
 								resolve(successful);
 							}).catch(function (err) {
-								reject("Update cache's lastest failed");
+								throw err;
 							});
 						} else {
-							reject("Undefined comment cache");
+							throw "Undefined comment cache";
 						}
 					}).catch(function (err) {
-						reject("Comment cache not found");
+						throw err;
 					});
 				}
 				else {
@@ -270,14 +296,14 @@ module.exports = {
 							Comment_cache.update({guid: reply_to}, {lastest: JSON.stringify(lastestContent)}).then(function (successful) {
 								resolve(successful);
 							}).catch(function (err) {
-								reject("Update cache's lastest failed");
+								throw err;
 							});
 						}
 						else {
-							reject("Undefined comment cache");
+							throw "Undefined comment cache";
 						}
 					}).catch(function (err) {
-						reject("Comment cache not found");
+						throw "Comment cache not found";
 					});
 				}
 			});
