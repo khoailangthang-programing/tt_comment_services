@@ -51,3 +51,12 @@ Lấy danh sách emoji| `/emoji` | `GET` | `params_4` | `output_4` |
  - status(int|(0-1))
  - message(array)
  - data(array chứa object)
+
+#### `params_5`:
+
+ - guid(required|int): id của comment cache
+
+#### `output_5`:
+ - status(int|(0-1))
+ - message(array)
+ - data(array chứa object)
