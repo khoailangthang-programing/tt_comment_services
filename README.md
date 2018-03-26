@@ -37,7 +37,7 @@ Lấy danh sách emoji| `/emoji` | `GET` | `params_4` | `output_4` |
 
 #### `params_3`:
 
- - nid(required|int): id của news
+ - filter[nid](required|int): id của news
  - page(required|int|>0): số page 
 
 #### `output_3`:
