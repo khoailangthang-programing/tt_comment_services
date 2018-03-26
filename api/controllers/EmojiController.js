@@ -8,7 +8,7 @@ module.exports = {
 			if (error) {
 				res.json(400, {message: 'Error !'});
 			}
-			response.items = result;
+			response.data = result;
 			response.status = 1;
 			res.json(response);
 		});

@@ -367,14 +367,14 @@ module.exports = {
 		var sendJson = function () {
 			getCommentsList.then(function (comments) {
 				var commentIdList = [];
-				response.items = comments;
+				response.data = comments;
 				for (var i = 0; i < comments.length; i++) {
 					if (commentIdList.indexOf(comments[i].cid) < 0) {
 						commentIdList.push(comments[i].cid);
 					}
-					response.items[i].subcomments = [];
-					response.items[i].created = TimeService.readableTime(comments[i].created);
-					response.items[i].content = htmlEntities.decode(comments[i].content);
+					response.data[i].subcomments = [];
+					response.data[i].created = TimeService.readableTime(comments[i].created);
+					response.data[i].content = htmlEntities.decode(comments[i].content);
 				}
 				if (commentIdList.length == 0) {
 					response.status = 1;
@@ -391,13 +391,13 @@ module.exports = {
 						result[m].content = htmlEntities.decode(result[m].content);
 						result[m].nid = req.query.filter.nid ? req.query.filter.nid : req.query.filter.aid;
 						result[m].username = result[m].uname;
-						var index = response.items.findIndex(function(element) {
+						var index = response.data.findIndex(function(element) {
 							if (element.cid == result[m].reply_to) {
 								return true;
 							}
 							return false;
 						});
-						response.items[index].subcomments.push(result[m]);
+						response.data[index].subcomments.push(result[m]);
 					}
 					response.status = 1;
 					res.json(response);
@@ -423,7 +423,7 @@ module.exports = {
 			if (error) {
 				res.json(400, {message: 'Error !'});
 			}
-			response.items = result;
+			response.data = result;
 			response.status = 1;
 			res.json(response);
 		});
