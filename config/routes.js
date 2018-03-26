@@ -7,5 +7,6 @@ module.exports.routes = {
   'post /comments/update': 'CommentsController.update',
   'get /comments': 'CommentsController.list',
   'get /emoji': 'EmojiController.list',
+  'get /commentcache': 'CommentsController.commentCache',
   '/comments/test': 'CommentsController.test'
 };
