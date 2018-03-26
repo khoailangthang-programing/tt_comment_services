@@ -70,10 +70,10 @@ module.exports = {
 						resolve(1);
 					}
 					else {
-						reject("Undefined comment");
+						throw "Undefined comment";
 					}
 				}).catch(function (err) {
-					throw err;
+					reject("Undefined comment id");
 				});
 			}
 		});
@@ -114,6 +114,10 @@ module.exports = {
 				optionals: ["CID"]
 			}
 			flag_join.join = createdComment.cid;
+			response.message.push("Comment id " + createdComment.cid + " was added by " + createdComment.uname);
+			response.data[0].comment_id = createdComment.cid;
+			response.data[0].user       = createdComment.uid + "__" + createdComment.uname;
+			response.data[0].content    = createdComment.content;
 			
 			return new Promise(function (resolve, reject) {
 				if(createdComment.reply_to == 0) {
@@ -124,10 +128,6 @@ module.exports = {
 					newCommentCache_Fields.lastest = JSON.stringify(newCommentCache_Fields.lastest);
 					// console.log(newCommentCache_Fields);
 					Comment_cache.create(newCommentCache_Fields).then(function (result) {
-						response.message.push("Comment id " + createdComment.cid + " was added by " + createdComment.uname);
-						response.data[0].comment_id = createdComment.cid;
-						response.data[0].user       = createdComment.uid + "__" + createdComment.uname;
-						response.data[0].content    = createdComment.content;
 						resolve(result);
 					}).catch(function (err) {
 						throw err;
@@ -149,12 +149,8 @@ module.exports = {
 								newCommentCache_Fields.lastest = JSON.stringify(lastestCache);
 							}
 
-							Comment_cache.update({guid: createdComment.reply_to}, newCommentCache_Fields).then(function (dataCreatedComment) {	
-								response.message.push("Comment id " + createdComment.cid + " added by " + createdComment.uname);
-								response.data[0].comment_id = createdComment.cid;
-								response.data[0].user = createdComment.uid + "__" + createdComment.uname;
-								response.data[0].content = createdComment.content;
-								resolve(dataCreatedComment);
+							Comment_cache.update({guid: createdComment.reply_to}, newCommentCache_Fields).then(function (dataUpdatedComment) {
+								resolve(dataUpdatedComment);
 							}).catch(function (err) {
 								throw err;
 							});
@@ -167,24 +163,31 @@ module.exports = {
 				}
 			});
 		}).then(function (createdCommentCache) {
-			console.log(flag_join);
-			if(flag_join.col == "news") {
-				News_comment.create({cid: flag_join.join, nid: parseInt(flag_join.val)}).then(function (success) {
-					return Promise.resolve(1);
-				}).catch(function (err) {
-					throw err;
-				});
-			}
-			else if(flag_join.col == "game") {
-				Game_comment.create({cid: flag_join.join, aid: parseInt(flag_join.val)}).then(function (success) {
-					return Promise.resolve(1);
-				}).catch(function (err) {
-					throw err;
-				});
-			}
 			response.message.push("Cache was changed");
-			response.data[0].commentcache_id = createdCommentCache.guid;
-			response.data[0].commentcache_latest = createdCommentCache.lastest;
+			if(createdCommentCache instanceof Array) {
+				response.data[0].commentcache_id = createdCommentCache[0].guid;
+				response.data[0].commentcache_latest = createdCommentCache[0].lastest;
+			}
+			else {
+				response.data[0].commentcache_id = createdCommentCache.guid;
+				response.data[0].commentcache_latest = createdCommentCache.lastest;
+			}
+			return new Promise(function (resolve, reject) {
+				if(flag_join.col == "news") {
+					News_comment.create({cid: flag_join.join, nid: parseInt(flag_join.val)}).then(function (success) {
+						resolve(1);
+					}).catch(function (err) {
+						throw err;
+					});
+				}
+				else if(flag_join.col == "game") {
+					Game_comment.create({cid: flag_join.join, aid: parseInt(flag_join.val)}).then(function (success) {
+						resolve(1);
+					}).catch(function (err) {
+						throw err;
+					});
+				}
+			});
 		}).then(function (successful) {
 			response.status = 1;
 			response.message.push("Table join has been created");
