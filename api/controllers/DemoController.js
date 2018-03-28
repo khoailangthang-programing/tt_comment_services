@@ -9,6 +9,13 @@ module.exports = {
 			sails.log(socketId)
 			sails.sockets.join(socketId, "tt_room", function () {
 				sails.sockets.broadcast('tt_room', 'connected', {message: 'Someone has connected to server'}, req)
+				fetch('http://localhost:1337/comments?page=1&filter[nid]=56')
+				    .then(function(response) {
+				       return response.text();
+				    })
+				    .then(function(myJson) {
+				       return res.json(JSON.parse(myJson));
+				});
 			});
 		}
 		else {

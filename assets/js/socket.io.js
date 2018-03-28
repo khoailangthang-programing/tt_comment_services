@@ -46,7 +46,12 @@ io.socket.on("commented", function (event) {
 })
 
 io.socket.get('/demo-comment', (resData, jwRes) => {
-	console.log(jwRes);
+	if(parseInt(resData.status) == 1) {
+		resData.data.forEach(function(cmt) {
+			let comment = player0(cmt.uname, cmt.content);
+			listComments.append(comment);
+		});
+	}
 });
 io.socket.on('connected', event => {
 	let item = itemMessage(event.message)
