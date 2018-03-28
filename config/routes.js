@@ -8,5 +8,7 @@ module.exports.routes = {
   'get /comments': 'CommentsController.list',
   'get /emoji': 'EmojiController.list',
   'get /commentcache': 'CommentsController.commentCache',
-  '/comments/test': 'CommentsController.test'
+  '/comments/test': 'CommentsController.test',
+  '/demo-comment': 'DemoController.comment',
+  'post /post-demo': 'DemoController.postComment'
 };

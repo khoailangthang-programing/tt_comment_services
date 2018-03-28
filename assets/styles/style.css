@@ -1,0 +1,25 @@
+body {
+	padding: 40px;
+}
+
+#comment {
+	border-right: 1px solid #ddd;
+}
+#comment-notify {
+	margin-bottom: 10px;
+}
+#comment-notify div {
+	display: flex;
+	flex-direction: row;
+}
+
+#comment-notify div span.notify {
+	width: 50px;
+}
+#comment-notify div span.message {
+	flex-grow: 1;
+}
+
+.player1 {
+	direction: rtl;
+}

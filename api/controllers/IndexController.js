@@ -1,6 +1,6 @@
 module.exports = {
 	index: function (req, res) {
-
+		return res.json(200, 'ok');
 	},
 	testModel: function (req, res) {
 		

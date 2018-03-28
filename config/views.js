@@ -1,5 +1,5 @@
 module.exports.views = {
   engine: 'ejs',
-  layout: false,
+  layout: 'layout',
   partials: false
 };
