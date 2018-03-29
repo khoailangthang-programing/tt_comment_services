@@ -38,17 +38,27 @@ module.exports = {
 		var form = new FormData();
 		var comment = req.param("comment");
 		var uname = req.param("name");
+		var reply_to = req.param("reply_to");
 
 		form.append('nid', 56);
 		form.append('uid', 949691);
 		form.append('uname', uname);
+		if (typeof reply_to != 'undefined') {
+			form.append('reply_to', reply_to);
+		}
 		form.append('ip', '192.255.10.10');
 		form.append('content', he.encode(comment));
 
 		fetch('http://localhost:1337/comments/create', {method: "POST", body: form})
 		.then(res => res.json())
     	.then(json => {
-    		sails.sockets.broadcast('tt_room', 'commented', {status: 1, data: {c: comment, u: uname}}, req);
+    		console.log(reply_to);
+    		if (typeof reply_to != 'undefined') {
+    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, data: {c: comment, u: uname, r: parseInt(reply_to)}}, req);
+    		}
+    		else {
+    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, data: {c: comment, u: uname, r: 0}}, req);
+    		}
     	})
     	.catch(function (err) {
 			throw err
