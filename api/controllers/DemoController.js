@@ -52,17 +52,16 @@ module.exports = {
 		fetch('http://localhost:1337/comments/create', {method: "POST", body: form})
 		.then(res => res.json())
     	.then(json => {
-    		console.log(reply_to);
     		if (typeof reply_to != 'undefined') {
-    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, data: {c: comment, u: uname, r: parseInt(reply_to)}}, req);
+    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, data: {c: comment, u: uname, r: parseInt(reply_to), m:1}}, req);
     		}
     		else {
-    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, data: {c: comment, u: uname, r: 0}}, req);
+    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, data: {c: comment, u: uname, r: json.data[0].comment_id, m: 0}}, req);
     		}
+    		res.json({status: 1, data: {c: comment, u: uname, r: json.data[0].comment_id}});
     	})
     	.catch(function (err) {
 			throw err
 		})
-		return res.json({status: 1, data: {c: comment, u: uname}});
 	}
 }

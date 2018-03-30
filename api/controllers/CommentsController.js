@@ -381,7 +381,7 @@ module.exports = {
 					res.json(response);
 					return;
 				}
-				Comment_new.getComment({reply_to: commentIdList, status: 1}, {}, function(error, result) {
+				Comment_new.getComment({reply_to: commentIdList, status: 1}, {order: "created DESC"}, function(error, result) {
 					if (error) {
 						reject(error);
 						return;

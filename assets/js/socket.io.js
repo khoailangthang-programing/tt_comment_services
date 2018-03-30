@@ -57,7 +57,7 @@ btnComment.on("click", function () {
 	}
 	io.socket.post('/post-demo', {name: name, comment: comment}, function (resData, jwRes) {
 		if(parseInt(resData.status) == 1) {
-			let comment = player0(resData.data.u, resData.data.c);
+			let comment = player0(resData.data.u, resData.data.c, resData.data.r);
 			listComments.prepend(comment);
 		}
 	});
@@ -66,7 +66,7 @@ btnComment.on("click", function () {
 
 io.socket.on("commented", function (event) {
 	if(parseInt(event.status) == 1) {
-		if (event.data.r != 0) {
+		if (event.data.m != 0) {
 			$('.repl-btnx').each(function () {
 				if ($(this).attr("data-cid") == event.data.r) {
 					let subcomment = player1(event.data.u, event.data.c);
@@ -76,7 +76,7 @@ io.socket.on("commented", function (event) {
 			});
 		}
 		else {
-			let comment = player0(event.data.u, event.data.c);
+			let comment = player0(event.data.u, event.data.c, event.data.r);
 			listComments.prepend(comment);
 		}
 	}
@@ -92,13 +92,16 @@ io.socket.get('/demo-comment', (resData, jwRes) => {
 		for (var i=0; i<resData.data.length;i++) {
 			let comment = player0(resData.data[i].uname, resData.data[i].content, resData.data[i].cid);
 			listComments.append(comment);
-			// if (resData.data[i].subcomments.length != 0) {
-			// 	for (var j=0; j<resData.data[i].subcomments.length; j++) {
-			// 		let subcomment = player1(resData.data[i].subcomments[j].uname, resData.data[i].subcomments[j].content);
-			// 		listSubComments = $('.repl-btnx').parent().parent().children(".sub-comments");
-			// 		listSubComments.append(subcomment);
-			// 	}
-			// }
+			if (resData.data[i].subcomments.length != 0) {
+				// console.log(resData.data)
+				// console.log(resData.data[i].subcomments);
+				for (var j=0; j<resData.data[i].subcomments.length; j++) {
+					let subcomment = player1(resData.data[i].subcomments[j].uname, resData.data[i].subcomments[j].content);
+					listSubComments = listComments.children(".player0").eq(i).children(".sub-comments");
+					listSubComments.append(subcomment);
+					console.log(listSubComments);
+				}
+			}
 		}
 	}
 });
