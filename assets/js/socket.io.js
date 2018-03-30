@@ -78,29 +78,28 @@ io.socket.on("commented", function (event) {
 		else {
 			let comment = player0(event.data.u, event.data.c);
 			listComments.prepend(comment);
-			let newlyCom = parseInt(notify.text());
-			if(isNaN(newlyCom)) {
-				newlyCom = 0;
-			}
-			notify.text(newlyCom + 1);
-				}
-			}
+		}
+	}
+	let newlyCom = parseInt(notify.text());
+	if(isNaN(newlyCom)) {
+		newlyCom = 0;
+	}
+	notify.text(newlyCom + 1);
 })
 
 io.socket.get('/demo-comment', (resData, jwRes) => {
 	if(parseInt(resData.status) == 1) {
-		resData.data.forEach(function(cmt) {
-			let comment = player0(cmt.uname, cmt.content, cmt.cid);
+		for (var i=0; i<resData.data.length;i++) {
+			let comment = player0(resData.data[i].uname, resData.data[i].content, resData.data[i].cid);
 			listComments.append(comment);
-			console.log(cmt.subcomments);
-			if (cmt.subcomments.length != 0) {
-				cmt.subcomments.forEach(function(subcmt) {
-					let subcomment = player1(subcmt.uname, subcmt.content);
-					listSubComments = $('.repl-btnx').parent().parent().children(".sub-comments");
-					listSubComments.append(subcomment);
-				})
-			}
-		});
+			// if (resData.data[i].subcomments.length != 0) {
+			// 	for (var j=0; j<resData.data[i].subcomments.length; j++) {
+			// 		let subcomment = player1(resData.data[i].subcomments[j].uname, resData.data[i].subcomments[j].content);
+			// 		listSubComments = $('.repl-btnx').parent().parent().children(".sub-comments");
+			// 		listSubComments.append(subcomment);
+			// 	}
+			// }
+		}
 	}
 });
 io.socket.on('connected', event => {
