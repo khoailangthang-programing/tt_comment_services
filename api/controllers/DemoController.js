@@ -6,9 +6,51 @@ module.exports = {
 	comment: function (req, res) {
 		if(req.isSocket) {
 			let socketId = sails.sockets.getId(req);
-			sails.log(socketId)
 			sails.sockets.join(socketId, "tt_room", function () {
 				sails.sockets.broadcast('tt_room', 'connected', {message: 'Someone has connected to server'}, req)
+				// emulator user session
+				var uid = 949691;
+				var nid = 56;
+				var checkJoin = new Promise((resolve, reject) => {
+					News_comment.find({
+						nid: nid
+					}).then((found) => {
+						resolve(found)
+					}).catch((err) => {
+						console.log(err);
+						reject(1)
+					})
+				});
+
+				checkJoin.then(news_comment => {
+					return new Promise((resolve, reject) => {
+						Comment_new.find({
+							uid: uid
+						}).then(comments => {
+							var comment_ids = []
+							for(let i = 0; i < news_comment.length; i ++) {
+								for(let j = 0; j < comments.length; j ++) {
+									if(news_comment[i].cid == comments[j].cid) {
+										if(comments[j].reply_to == 0)
+											comment_ids.push(news_comment[i].cid)
+										else
+											comment_ids.push(news_comment[i].reply_to)
+									}
+								}
+							}
+							resolve(comment_ids)
+						}).catch(err => {
+							console.log(err);
+						})
+					})
+				}).then(allComment => {
+					for(let i = 0; i < allComment.length; i ++) {
+						sails.sockets.join(socketId, allComment[i])
+					}
+				}).catch(err => {
+					console.log(err)
+					console.log("no room to care")
+				})
 				fetch('http://localhost:1337/comments?page=1&filter[nid]=56')
 				    .then(function(response) {
 				       return response.text();
@@ -33,7 +75,6 @@ module.exports = {
 		}
 
 		var socketId = sails.sockets.getId(req);
-		sails.sockets.join(socketId, "tt_room", () => {});
 
 		var form = new FormData();
 		var comment = req.param("comment");
@@ -53,15 +94,20 @@ module.exports = {
 		.then(res => res.json())
     	.then(json => {
     		if (typeof reply_to != 'undefined') {
-    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, data: {c: comment, u: uname, r: parseInt(reply_to), m:1}}, req);
+    			sails.sockets.join(socketId, reply_to, () => {});
+    			sails.sockets.join(socketId, 'tt_room', () => {});
+    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, availableRoom: 'reply_' + reply_to, data: {c: comment, u: uname, r: parseInt(reply_to), m:1}}, req);
+    			sails.sockets.broadcast(reply_to, 'reply_' + reply_to, {status: 1, data: {c: comment, u: uname, r: parseInt(reply_to), m:1}}, req);
     		}
     		else {
-    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, data: {c: comment, u: uname, r: json.data[0].comment_id, m: 0}}, req);
+    			sails.sockets.join(socketId, json.data[0].comment_id, () => {});
+    			sails.sockets.join(socketId, 'tt_room', () => {});
+    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, availableRoom: 'main_' + json.data[0].comment_id, data: {c: comment, u: uname, r: json.data[0].comment_id, m: 0}}, req);
     		}
     		res.json({status: 1, data: {c: comment, u: uname, r: json.data[0].comment_id}});
     	})
     	.catch(function (err) {
-			throw err
+			console.log(err)
 		})
 	}
 }

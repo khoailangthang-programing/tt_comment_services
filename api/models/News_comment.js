@@ -16,6 +16,7 @@ module.exports = {
   	},
   	nid: {
   		type: "integer",
+      primaryKey: true,
   		required: true
   	}
   }

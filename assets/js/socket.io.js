@@ -6,6 +6,7 @@ const frmName = $("#frm-name")
 const replName = $("#repl-name")
 const notify = $("span.notify")
 const alert = $("span.message")
+var eventOnRoom = ''
 const publicMessage = $("#public-messages").children("#messages")
 var player0 = function (playerName, message, cid) { 
 	return "<div class='col-lg-12 player0'><p class='label label-success'>" + playerName + "</p><div class='well'>" + message + "</div><div class='sencond-line'><span class='crte-time'>2017 </span><a class='repl-btnx' href='javascript: void(0)' data-cid="+cid+" onclick='show(this);'>Phản hồi</a></div><div class='row sub-comments'></div></div>";
@@ -63,7 +64,6 @@ btnComment.on("click", function () {
 	});
 });
 
-
 io.socket.on("commented", function (event) {
 	if(parseInt(event.status) == 1) {
 		if (event.data.m != 0) {
@@ -74,12 +74,23 @@ io.socket.on("commented", function (event) {
 					listSubComments.prepend(subcomment);
 				} 
 			});
+
+			eventOnRoom = event.availableRoom;
 		}
 		else {
 			let comment = player0(event.data.u, event.data.c, event.data.r);
 			listComments.prepend(comment);
+			let newlyCom = parseInt(notify.text());
+			if(isNaN(newlyCom)) {
+				newlyCom = 0;
+			}
+			notify.text(newlyCom + 1);
 		}
 	}
+})
+
+io.socket.on(eventOnRoom, event => {
+	console.log(event)
 	let newlyCom = parseInt(notify.text());
 	if(isNaN(newlyCom)) {
 		newlyCom = 0;
@@ -99,7 +110,6 @@ io.socket.get('/demo-comment', (resData, jwRes) => {
 					let subcomment = player1(resData.data[i].subcomments[j].uname, resData.data[i].subcomments[j].content);
 					listSubComments = listComments.children(".player0").eq(i).children(".sub-comments");
 					listSubComments.append(subcomment);
-					console.log(listSubComments);
 				}
 			}
 		}
