@@ -76,6 +76,14 @@ io.socket.on("commented", function (event) {
 			});
 
 			eventOnRoom = event.availableRoom;
+			io.socket.on(eventOnRoom, event => {
+				console.log(event)
+				let newlyCom = parseInt(notify.text());
+				if(isNaN(newlyCom)) {
+					newlyCom = 0;
+				}
+				notify.text(newlyCom + 1);
+			})
 		}
 		else {
 			let comment = player0(event.data.u, event.data.c, event.data.r);
@@ -87,15 +95,6 @@ io.socket.on("commented", function (event) {
 			notify.text(newlyCom + 1);
 		}
 	}
-})
-
-io.socket.on(eventOnRoom, event => {
-	console.log(event)
-	let newlyCom = parseInt(notify.text());
-	if(isNaN(newlyCom)) {
-		newlyCom = 0;
-	}
-	notify.text(newlyCom + 1);
 })
 
 io.socket.get('/demo-comment', (resData, jwRes) => {
