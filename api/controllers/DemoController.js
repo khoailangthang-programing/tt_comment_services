@@ -9,7 +9,7 @@ module.exports = {
 			sails.sockets.join(socketId, "tt_room", function () {
 				sails.sockets.broadcast('tt_room', 'connected', {message: 'Someone has connected to server'}, req)
 				// emulator user session
-				var uid = 949691;
+				var uid = Math.floor((Math.random() * 1000) + 1) + 949691;
 				var nid = 56;
 				var checkJoin = new Promise((resolve, reject) => {
 					News_comment.find({
@@ -82,7 +82,7 @@ module.exports = {
 		var reply_to = req.param("reply_to");
 
 		form.append('nid', 56);
-		form.append('uid', 949691);
+		form.append('uid', Math.floor((Math.random() * 1000) + 1) + 949691);
 		form.append('uname', uname);
 		if (typeof reply_to != 'undefined') {
 			form.append('reply_to', reply_to);
@@ -95,14 +95,14 @@ module.exports = {
     	.then(json => {
     		if (typeof reply_to != 'undefined') {
     			sails.sockets.join(socketId, reply_to, () => {});
-    			sails.sockets.join(socketId, 'tt_room', () => {});
-    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, availableRoom: 'reply_' + reply_to, data: {c: comment, u: uname, r: parseInt(reply_to), m:1}}, req);
-    			sails.sockets.broadcast(reply_to, 'reply_' + reply_to, {status: 1, data: {c: comment, u: uname, r: parseInt(reply_to), m:1}}, req);
+    			// sails.sockets.join(socketId, 'tt_room', () => {});
+    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, data: {c: comment, u: uname, r: parseInt(reply_to), m:1}}, req);
+    			sails.sockets.broadcast(reply_to, 'reply', {status: 1, data: {c: comment, u: uname, r: parseInt(reply_to), m:1}}, req);
     		}
     		else {
     			sails.sockets.join(socketId, json.data[0].comment_id, () => {});
-    			sails.sockets.join(socketId, 'tt_room', () => {});
-    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, availableRoom: 'main_' + json.data[0].comment_id, data: {c: comment, u: uname, r: json.data[0].comment_id, m: 0}}, req);
+    			// sails.sockets.join(socketId, 'tt_room', () => {});
+    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, data: {c: comment, u: uname, r: json.data[0].comment_id, m: 0}}, req);
     		}
     		res.json({status: 1, data: {c: comment, u: uname, r: json.data[0].comment_id}});
     	})
