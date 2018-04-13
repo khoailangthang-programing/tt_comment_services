@@ -18,7 +18,7 @@ module.exports = {
 		var nid = req.validate({"nid": "numeric"}, false);
 		var aid = req.validate({"aid": "numeric"}, false);
 		if(!nid && !aid) {
-			response.message.push("Newsid or Aid don't exist. Ignore request");
+			response.message.push("Newsid or Appid don't exist. Ignore request");
 			return res.json(400, response);
 		}
 		else {

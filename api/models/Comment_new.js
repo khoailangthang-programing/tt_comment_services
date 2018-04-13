@@ -142,6 +142,6 @@ module.exports = {
         }).catch(function(error) {
           callback(error, []);
         });
-    },
+  }
 };
 

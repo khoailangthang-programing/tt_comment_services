@@ -71,24 +71,30 @@ module.exports = {
 	},
 	postComment: function (req, res) {
 		if(!req.isSocket) {
-			return res.badRequest();
+			return res.json(403, "You don\'t have permission to access");
 		}
 
 		var socketId = sails.sockets.getId(req);
 
 		var form = new FormData();
 		var comment = req.param("comment");
-		var uname = req.param("name");
+		var nid = req.param("nid");
+		var uid = req.param("uid");
+		var ip = req.param("ip");
 		var reply_to = req.param("reply_to");
+		var promoted = req.param("promoted");
 
-		form.append('nid', 56);
-		form.append('uid', Math.floor((Math.random() * 1000) + 1) + 949691);
-		form.append('uname', uname);
+		form.append('nid', nid);
+		form.append('uid', uid);
+		form.append('ip', ip);
+		form.append('content', comment);
+
 		if (typeof reply_to != 'undefined') {
 			form.append('reply_to', reply_to);
 		}
-		form.append('ip', '192.255.10.10');
-		form.append('content', he.encode(comment));
+		if (typeof promoted != 'undefined') {
+			form.append('promoted', promoted);
+		}
 
 		fetch('http://localhost:1337/comments/create', {method: "POST", body: form})
 		.then(res => res.json())

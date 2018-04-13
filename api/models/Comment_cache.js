@@ -7,6 +7,7 @@
 
 module.exports = {
   connection: 'mysqlThapThanhCoreDev',
+  tableName: 'comment_cache',
   attributes: {
   	guid: {
   		type: "integer",
