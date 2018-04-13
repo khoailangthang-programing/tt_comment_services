@@ -124,7 +124,7 @@ module.exports = {
               userIdList.push(comments[i].uid);
             }
             var userIdListStr = "(" + userIdList.join() + ")";
-            MemcachedService.queryCache(Comment_new, "SELECT uid, name FROM users WHERE uid IN " + userIdListStr, [], function(error, result) {
+            MemcachedService.queryCache(Comment_new, "SELECT uid, name FROM tamtay_ids.users WHERE uid IN " + userIdListStr, [], function(error, result) {
               if (error) {
                 reject(error);
                 return;

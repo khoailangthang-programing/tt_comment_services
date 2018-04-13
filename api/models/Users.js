@@ -1,5 +1,5 @@
 var conn = require('../../config/connections')
-var mysql = require('mysql')
+// var mysql = require('mysql')
 module.exports = {
   connection: 'mysqlTamTayIdsDev',
   attributes: {

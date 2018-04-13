@@ -7,6 +7,7 @@ module.exports.routes = {
   'post /comments/create': 'CommentsController.create',
   'post /comments/update': 'CommentsController.update',
   'get /comments': 'CommentsController.list',
+  'get /subcomment': 'CommentsController.subcomment',
   'get /emoji': 'EmojiController.list',
   'get /commentcache': 'CommentsController.commentCache',
     // Middle api

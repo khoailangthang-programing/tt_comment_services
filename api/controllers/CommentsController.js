@@ -419,14 +419,56 @@ module.exports = {
 			status: 0,
 			messages: []
 		};
+		
 		Comment_cache.find({guid: req.query.guid}, {}, function(error, result) {
 			if (error) {
 				res.json(400, {message: 'Error !'});
 			}
+			var lastestComment = [];
 			response.data = result;
+			for (var i = 0; i < result.length; i++) {
+				var lastestComment = JSON.parse(result[i].lastest);
+				
+				response.data[i].guid = result[i].guid;
+				response.data[i].count = result[i].count;
+				response.data[i].lastest = [];
+				for (var j = 0; j < lastestComment.length; j++) {
+					lastestComment[j].content = htmlEntities.decode(lastestComment[j].content);
+					lastestComment[j].created = TimeService.readableTime(lastestComment[j].created);
+					response.data[i].lastest.push(lastestComment[j]);
+				}
+			}
+			// console.log(response.data);
+			// response.data = result;
+			// console.log(response);
+			response.status = 1;
+			res.json(response);
+		});
+	},
+
+	subcomment: function (req, res) {
+		var response = {
+			status: 0,
+			messages: []
+		};
+		var commentIdList = req.param('cid');
+		var diff = req.param('diff');
+		
+		Comment_new.query('SELECT * FROM `comment_new` WHERE reply_to = ? ORDER BY created DESC LIMIT '+diff+' OFFSET 2', [ commentIdList ], function(error, result) {
+			if (error) {
+				res.json(400, {message: 'Error !'});
+			}
+			
+			response.data = result;
+			for (var i=0; i<result.length; i++) {
+				response.data[i].changed = TimeService.readableTime(result[i].changed);
+				response.data[i].content = htmlEntities.decode(result[i].content);
+			}
 			response.status = 1;
 			res.json(response);
 		});
 	}
+
+
 };
 
