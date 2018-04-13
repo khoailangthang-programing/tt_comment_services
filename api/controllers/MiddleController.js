@@ -77,12 +77,12 @@ module.exports = {
 		var socketId = sails.sockets.getId(req);
 
 		var form = new FormData();
-		var comment = req.param("comment");
-		var nid = req.param("nid");
-		var uid = req.param("uid");
-		var ip = req.param("ip");
-		var reply_to = req.param("reply_to");
-		var promoted = req.param("promoted");
+		var comment = req.body.comment;
+		var nid = req.body.nid;
+		var uid = req.body.uid;
+		var ip = req.body.ip;
+		var reply_to = req.body.reply_to;
+		var promoted = req.body.promoted;
 
 		form.append('nid', nid);
 		form.append('uid', uid);
@@ -96,24 +96,58 @@ module.exports = {
 			form.append('promoted', promoted);
 		}
 
-		fetch('http://localhost:1337/comments/create', {method: "POST", body: form})
-		.then(res => res.json())
-    	.then(json => {
-    		if (typeof reply_to != 'undefined') {
-    			sails.sockets.join(socketId, reply_to, () => {});
-    			// sails.sockets.join(socketId, 'tt_room', () => {});
-    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, data: {c: comment, u: uname, r: parseInt(reply_to), m:1}}, req);
-    			sails.sockets.broadcast(reply_to, 'reply', {status: 1, data: {c: comment, u: uname, r: parseInt(reply_to), m:1}}, req);
-    		}
-    		else {
-    			sails.sockets.join(socketId, json.data[0].comment_id, () => {});
-    			// sails.sockets.join(socketId, 'tt_room', () => {});
-    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, data: {c: comment, u: uname, r: json.data[0].comment_id, m: 0}}, req);
-    		}
-    		res.json({status: 1, data: {c: comment, u: uname, r: json.data[0].comment_id}});
-    	})
-    	.catch(function (err) {
-			console.log(err)
+		// Check user
+		var checkExistUser = new Promise(function (resolve, reject) {
+			var uid = parseInt(uid);
+			if(isNaN(uid) || uid == 0) {
+				res.json({message: "User is not defined !"});
+				res.end()
+			}
+			else {
+				Users.findOne({
+					uid: uid
+				}).then(function (found) {
+					resolve(1);
+				}).catch(function (err) {
+					reject(err);
+				})
+			}
+		});
+		checkExistUser.then(function (isExist) {
+			// Check online
+			Sessions.findOne({
+				uid: uid
+			}).then(function (found) {
+				resolve(found);
+			}).catch(function (err) {
+				throw err;
+			})
+		}).then(function (user) {
+			console.log(user);
+			// form.append('uname', user.name);
+
+			fetch('http://localhost:1337/comments/create', {method: "POST", body: form})
+			.then(res => res.json())
+	    	.then(json => {
+	    		if (typeof reply_to != 'undefined') {
+	    			sails.sockets.join(socketId, reply_to, () => {});
+	    			// sails.sockets.join(socketId, 'tt_room', () => {});
+	    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, data: {c: comment, u: uname, r: parseInt(reply_to), m:1}}, req);
+	    			sails.sockets.broadcast(reply_to, 'reply', {status: 1, data: {c: comment, u: uname, r: parseInt(reply_to), m:1}}, req);
+	    		}
+	    		else {
+	    			sails.sockets.join(socketId, json.data[0].comment_id, () => {});
+	    			// sails.sockets.join(socketId, 'tt_room', () => {});
+	    			sails.sockets.broadcast('tt_room', 'commented', {status: 1, data: {c: comment, u: uname, r: json.data[0].comment_id, m: 0}}, req);
+	    		}
+	    		res.json({status: 1, data: {c: comment, u: uname, r: json.data[0].comment_id}});
+	    	})
+	    	.catch(function (err) {
+				throw err;
+			})
+		}).catch(function(err) {
+			res.json({message: "Có lỗi xảy ra khi thêm bình luận"})
+			res.end()
 		})
 	}
 }
