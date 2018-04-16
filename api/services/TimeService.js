@@ -1,8 +1,9 @@
-var currentTime = new Date();
-    currentTimestamp = Math.floor(currentTime.getTime()/1000);
+
 module.exports = {
 
     readableTime: function (timestamp) {
+        var currentTime = new Date();
+        currentTimestamp = Math.floor(currentTime.getTime()/1000);
         var time = currentTimestamp - timestamp;
         var readable = 0;
         if (time >= 0 && time < 60) {
