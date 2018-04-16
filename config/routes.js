@@ -12,6 +12,7 @@ module.exports.routes = {
   'get /commentcache': 'CommentsController.commentCache',
     // Middle api
   '/middle-api/add-comment': 'MiddleController.postComment',
+  '/middle-api/join-comment-rooms': 'MiddleController.commentRooms',
     // Test api
   '/comments/test': 'CommentsController.test',
   '/demo-comment': 'DemoController.comment',
