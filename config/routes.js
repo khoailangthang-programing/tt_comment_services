@@ -10,6 +10,7 @@ module.exports.routes = {
   'get /subcomment': 'CommentsController.subcomment',
   'get /emoji': 'EmojiController.list',
   'get /commentcache': 'CommentsController.commentCache',
+  'get /commentscount': 'CommentsController.listCommentCount', 
     // Middle api
   '/middle-api/add-comment': 'MiddleController.postComment',
   '/middle-api/join-comment-rooms': 'MiddleController.commentRooms',

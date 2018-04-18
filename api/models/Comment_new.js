@@ -90,7 +90,7 @@ module.exports = {
             optionsString += " ORDER BY " + options.order;
           }
           if (options.limit) {
-            optionsString += " LIMIT " + (options.limit + 1);
+            optionsString += " LIMIT " + options.limit;
           }
           if (options.page) {
             optionsString += " OFFSET " + (options.limit*(options.page - 1));
@@ -102,7 +102,6 @@ module.exports = {
         } else if (filter.hasOwnProperty("aid")) {
           sql = "SELECT `"+this.tableName+"`.*, `game_comment`.aid, `game_comment`.type FROM `"+this.tableName+"` LEFT JOIN `game_comment` ON `"+this.tableName+"`.cid = `game_comment`.cid WHERE " + condition + optionsString;
         }
-
         var promise = new Promise(function(resolve, reject) {
           MemcachedService.queryCache(Comment_new, ''+sql, bind, function(error, result) {
             if (error) {
