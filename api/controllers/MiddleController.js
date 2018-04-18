@@ -12,14 +12,13 @@ module.exports = {
 		// sails.sockets.broadcast("tt_room", "hello", {data: "new"}, req)
 		// return res.json(200, "ok")
 		if(req.isSocket) {
-			sails.sockets.join(req, "tt_room");
-
 			var uid = req.body.uid;
 			var nid = req.body.nid;
 			var checkJoin = new Promise((resolve, reject) => {
 				News_comment.find({
 					nid: req.body.nid
 				}).then((found) => {
+					sails.sockets.join(req, "tt_room_"+req.body.nid);
 					resolve(found)
 				}).catch((err) => {
 					console.log(err);
@@ -115,12 +114,14 @@ module.exports = {
 	    		// sails.sockets.broadcast("tt_room", "hello", {status: 1, data: {c: json.data[0].content, u: user.name, r: json.data[0].comment_id, m: 0}}, req)
 	    		if (req.body.reply_to != 0) {
 	    			sails.sockets.join(req, "" + req.body.reply_to);
-	    			sails.sockets.broadcast("" + req.body.reply_to, "reply", {status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, reply: parseInt(req.body.reply_to), time: json.data[0].time, m:1}}, req);
+	    			// below broadcast used to notify to specific sockets which are related to this reply
+	    			// sails.sockets.broadcast("" + req.body.reply_to, "reply", {status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, reply: parseInt(req.body.reply_to), time: json.data[0].time, m:1}}, req);
+	    			sails.sockets.broadcast("tt_room_"+req.body.nid, "reply", {status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, reply: parseInt(req.body.reply_to), time: json.data[0].time, m:1}}, req);
 	    			res.json({status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, reply: parseInt(req.body.reply_to), time: json.data[0].time}});
 	    		}
 	    		else {
 	    			sails.sockets.join(req, "" + json.data[0].comment_id);
-	    			sails.sockets.broadcast("tt_room", "comment", {status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, time: json.data[0].time, m: 0}}, req);
+	    			sails.sockets.broadcast("tt_room_"+req.body.nid, "comment", {status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, time: json.data[0].time, m: 0}}, req);
 	    			res.json({status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, time: json.data[0].time}});
 	    		}
 	    	})
