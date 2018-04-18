@@ -115,13 +115,14 @@ module.exports = {
 	    		// sails.sockets.broadcast("tt_room", "hello", {status: 1, data: {c: json.data[0].content, u: user.name, r: json.data[0].comment_id, m: 0}}, req)
 	    		if (req.body.reply_to != 0) {
 	    			sails.sockets.join(req, "" + req.body.reply_to);
-	    			sails.sockets.broadcast("" + req.body.reply_to, "reply", {status: 1, data: {c: json.data[0].content, u: user.name, r: parseInt(req.body.reply_to), m:1}}, req);
+	    			sails.sockets.broadcast("" + req.body.reply_to, "reply", {status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, reply: parseInt(req.body.reply_to), time: json.data[0].time, m:1}}, req);
+	    			res.json({status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, reply: parseInt(req.body.reply_to), time: json.data[0].time}});
 	    		}
 	    		else {
 	    			sails.sockets.join(req, "" + json.data[0].comment_id);
-	    			sails.sockets.broadcast("tt_room", "comment", {status: 1, data: {c: json.data[0].content, u: user.name, r: json.data[0].comment_id, m: 0}}, req);
+	    			sails.sockets.broadcast("tt_room", "comment", {status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, time: json.data[0].time, m: 0}}, req);
+	    			res.json({status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, time: json.data[0].time}});
 	    		}
-	    		res.json({status: 1, data: {c: json.data[0].content, u: user.name, r: json.data[0].comment_id}});
 	    	})
 	    	.catch(function (err) {
 				throw err;
