@@ -118,6 +118,7 @@ module.exports = {
 			response.data[0].comment_id = createdComment.cid;
 			response.data[0].user       = createdComment.uid + "__" + createdComment.uname;
 			response.data[0].content    = createdComment.content;
+			response.data[0].time    	= createdComment.changed;
 			
 			return new Promise(function (resolve, reject) {
 				if(createdComment.reply_to == 0) {
