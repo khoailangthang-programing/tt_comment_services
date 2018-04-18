@@ -467,6 +467,27 @@ module.exports = {
 			response.status = 1;
 			res.json(response);
 		});
+	},
+
+	listCommentCount: function (req, res) {
+		var response = {
+			status: 0,
+			messages: []
+		};
+
+		var nid = req.param('nid');
+		var bind = [nid, 0, 1];
+		var sql = "SELECT COUNT(*) AS total_comment FROM `comment_new` LEFT JOIN `news_comment` ON `comment_new`.cid = `news_comment`.cid WHERE `nid`=? AND `reply_to`=? AND `status`=? ";
+
+		MemcachedService.queryCache(Comment_new,''+sql, bind, function (error, result) {
+			if (error) {
+				res.json(400, {message: 'Error !'});
+			}
+
+			response.data = result;
+			response.status = 1;
+			res.json(response);
+		});
 	}
 
 
