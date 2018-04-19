@@ -182,7 +182,7 @@ module.exports = {
 					});
 				}
 				else if(flag_join.col == "game") {
-					Game_comment.create({cid: flag_join.join, aid: parseInt(flag_join.val)}).then(function (success) {
+					Game_comment.create({cid: flag_join.join, aid: parseInt(flag_join.val), type: 1}).then(function (success) {
 						resolve(1);
 					}).catch(function (err) {
 						throw err;
