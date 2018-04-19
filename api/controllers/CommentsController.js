@@ -376,6 +376,7 @@ module.exports = {
 					response.data[i].subcomments = [];
 					response.data[i].created = TimeService.readableTime(comments[i].created);
 					response.data[i].content = htmlEntities.decode(comments[i].content);
+					response.data[i].changed = TimeService.readableTime(comments[i].changed);
 				}
 				if (commentIdList.length == 0) {
 					response.status = 1;
@@ -390,6 +391,7 @@ module.exports = {
 					for (var m = 0; m < result.length; m++) {
 						result[m].created = TimeService.readableTime(result[m].created);
 						result[m].content = htmlEntities.decode(result[m].content);
+						result[m].changed = TimeService.readableTime(result[m].changed);
 						result[m].nid = req.query.filter.nid ? req.query.filter.nid : req.query.filter.aid;
 						result[m].username = result[m].uname;
 						var index = response.data.findIndex(function(element) {
@@ -452,6 +454,7 @@ module.exports = {
 			status: 0,
 			messages: []
 		};
+		
 		var commentIdList = req.param('cid');
 		var diff = req.param('diff');
 		
@@ -476,10 +479,15 @@ module.exports = {
 			messages: []
 		};
 
-		var nid = req.param('nid');
+		if (req.query.hasOwnProperty("nid")) {
+			var nid = req.param('nid');
+			var sql = "SELECT COUNT(*) AS total_comment FROM `comment_new` LEFT JOIN `news_comment` ON `comment_new`.cid = `news_comment`.cid WHERE `nid`=? AND `reply_to`=? AND `status`=? ";
+		} else if (req.query.hasOwnProperty("aid")) {
+			var nid = req.param('aid');
+			var sql = "SELECT COUNT(*) AS total_comment FROM `comment_new` LEFT JOIN `game_comment` ON `comment_new`.cid = `game_comment`.cid WHERE `aid`=? AND `reply_to`=? AND `status`=? ";
+		}
 		var bind = [nid, 0, 1];
-		var sql = "SELECT COUNT(*) AS total_comment FROM `comment_new` LEFT JOIN `news_comment` ON `comment_new`.cid = `news_comment`.cid WHERE `nid`=? AND `reply_to`=? AND `status`=? ";
-
+	
 		MemcachedService.queryCache(Comment_new,''+sql, bind, function (error, result) {
 			if (error) {
 				res.json(400, {message: 'Error !'});
