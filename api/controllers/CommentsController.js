@@ -36,6 +36,7 @@ module.exports = {
 			{"uname": "string"},
 			{"reply_to?": "int"},
 			{"promoted?": "int"},
+			{"type?": "int"},
 			{"ip": "ip"},
 			{"content": "string"}
 		], false);
@@ -182,7 +183,7 @@ module.exports = {
 					});
 				}
 				else if(flag_join.col == "game") {
-					Game_comment.create({cid: flag_join.join, aid: parseInt(flag_join.val), type: 1}).then(function (success) {
+					Game_comment.create({cid: flag_join.join, aid: parseInt(flag_join.val), type: params.type}).then(function (success) {
 						resolve(1);
 					}).catch(function (err) {
 						throw err;

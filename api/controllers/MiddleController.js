@@ -85,6 +85,7 @@ module.exports = {
 		else if(nid && typeof aid == "undefined") {
 			form.append('nid', req.body.nid);
 		}
+
 		form.append('uid', req.body.uid);
 		form.append('ip', req.body.ip);
 		form.append('content', req.body.comment);
@@ -101,7 +102,12 @@ module.exports = {
 			Users.findOne({
 				uid: req.body.uid
 			}).then(function (found) {
-				resolve(1);
+				if(typeof found != "undefined") {
+					resolve(found);
+				}
+				else {
+					throw "User dose not exist!"
+				}
 			}).catch(function (err) {
 				reject(err);
 			})
@@ -110,11 +116,99 @@ module.exports = {
 			return new Promise(function (resolve, reject) {
 				// Check online
 				Sessions.findOne({
-					sid: req.body.sid
+					sid: req.body.sid,
+					uid: isExist.uid
 				}).then(function (found) {
-					resolve(found);
+					if(typeof found != "undefined") {
+						if(req.body.status == 1) {
+							// admins array(app10 in ActionBase line 22)
+							let admins = [
+					            860700,
+					            6152817,
+					            448,
+					            1076396,
+					            1076421,
+					            993928,
+					            1076407,
+					            1077337,
+					            1511956,
+					            949691,
+					            950260,
+					            981825,
+					            1075980,
+					            1076416,
+					            1076425,
+					            10041104,
+					            1165962,
+					            243663,
+					            444,
+					            12,
+					            85592,
+					            9576770,
+					            300819,
+					            8372072,
+					            9822963,
+					            8438905,
+					            8438882,
+					            13403278,
+					            9409179,
+					            6797913,
+					            5562926,
+					            7940016,
+					            7939076,
+					            11483358,
+					            13074184,
+					            7179714,
+					            12283573,
+					            9628607,
+					            17740618,
+					            8617960,
+					            14794545,
+					            18458757,
+					            9979982,
+					            367484,
+					            9079728,
+					            17967407,
+					            18011132,
+					            18014303,
+					            16043906,
+					            9262240,
+					            9105055,
+					            7683352,
+					            14576867,
+					            19273405,
+					            18256421,
+					            19273511,
+					            5260047,
+					            19344717,
+					            19341175,
+					            16746645,
+					            15899324,
+					            18619989,
+					            15106018,
+								16321209,
+								20029840,
+								20030009
+					        ]
+					        if (admins.indexOf(found.uid) != -1){
+					        	form.append('type', 1);
+					         	resolve(found);   
+					        }
+					        else {
+					        	reject(1)
+					        }
+					    }
+					    else {
+					    	form.append('type', 0);
+					    	resolve(found);
+					    }
+					}
+					else {
+						throw "User session is not valid !"
+					}
 				}).catch(function (err) {
-					throw err;
+					// throw err;
+					throw "Invalid property ! Ignore request";
 				})
 			})
 		}).then(function (user) {
@@ -148,11 +242,13 @@ module.exports = {
 	    		}
 	    	})
 	    	.catch(function (err) {
-				throw err;
+				// throw err;
+				// ignore all fake request from client then throw below error
+				throw "I am fake request, reject me !"
 			})
 		}).catch(function(err) {
 			console.log(err)
-			return res.json({message: "Có lỗi xảy ra khi thêm bình luận"})
+			return res.json({status: 0, message: "Có lỗi xảy ra khi thêm bình luận"})
 		})
 	}
 }
