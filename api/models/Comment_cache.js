@@ -6,7 +6,7 @@
  */
 
 module.exports = {
-  connection: 'mysqlThapThanhCoreDev',
+  connection: 'mysqlThapThanhCorePro',
   tableName: 'comment_cache',
   attributes: {
   	guid: {

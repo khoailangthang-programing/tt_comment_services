@@ -1,5 +1,5 @@
 module.exports = {
-  connection: 'mysqlThapThanhCoreDev',
+  connection: 'mysqlThapThanhCorePro',
 	tableName: 'news_comment',
   attributes: {
   	cid: {

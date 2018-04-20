@@ -1,6 +1,6 @@
 
 module.exports = {
-  connection: 'mysqlThapThanhIdsDev',
+  connection: 'mysqlThapThanhIdsPro',
 	tableName: 'sessions',
   attributes: {
   	uid: {

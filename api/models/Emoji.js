@@ -6,7 +6,7 @@
  */
 
 module.exports = {
-  connection: 'mysqlThapThanhCoreDev',
+  connection: 'mysqlThapThanhCorePro',
   tableName: 'emoji',
   attributes: {
   	eid: {

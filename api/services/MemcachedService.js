@@ -1,5 +1,5 @@
 var Memcached = require('memcached');
-var memcached = new Memcached(''+sails.config.connections.memcachedDev.host+":"+sails.config.connections.memcachedDev.port);
+var memcached = new Memcached(''+sails.config.connections.memcached.host+":"+sails.config.connections.memcached.port);
 var crypto = require('crypto');
 
 module.exports = {

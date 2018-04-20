@@ -1,7 +1,8 @@
 var conn = require('../../config/connections')
 // var mysql = require('mysql')
 module.exports = {
-  connection: 'mysqlTamTayIdsDev',
+  connection: 'mysqlTamTayIdsPro',
+  tableName: 'users',
   attributes: {
   	uid: {
       type: "integer",

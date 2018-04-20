@@ -1,7 +1,5 @@
 module.exports = {
-
   models: {
-    connection:  ['mysqlThapThanhCoreDev', 'mysqlTamTayIdsDev']
+    connection:  ['mysqlThapThanhCoreDev', 'mysqlThapThanhIdsDev', 'mysqlTamTayIdsDev']
   }
-
 };

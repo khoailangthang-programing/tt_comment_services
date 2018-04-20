@@ -41,13 +41,7 @@ module.exports.connections = {
     password: '', //optional
     database: 'tamtay_ids' //optional
   },
-
-  memcachedDev: {
-    host: 'localhost',
-    port: '11211'
-  },
-
-  memcachedPro: {
+  memcached: {
     host: 'localhost',
     port: '11211'
   }
