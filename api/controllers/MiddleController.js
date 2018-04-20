@@ -1,18 +1,15 @@
 var fetch = require('node-fetch')
 var FormData = require('form-data')
 var he = require("he")
-process.on('unhandledRejection', (reason, p) => {
-  console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
-  // application specific logging, throwing an error, or other logic here
-});
+// process.on('unhandledRejection', (reason, p) => {
+//   console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
+//   // application specific logging, throwing an error, or other logic here
+// });
 module.exports = {
 	commentRooms: function (req, res) {
 		if(req.isSocket) {
-			var uid = req.body.uid;
-			var nid = req.body.nid;
-			var aid = req.body.aid;
 			var checkJoin = new Promise((resolve, reject) => {
-				if(aid && typeof nid == "undefined") {
+				if(req.body.aid && typeof req.body.nid == "undefined") {
 					Game_comment.find({
 						aid: req.body.aid
 					}).then((found) => {
@@ -23,7 +20,7 @@ module.exports = {
 						reject(1)
 					})
 				}
-				else if(nid && typeof aid == "undefined") {
+				else if(req.body.nid && typeof req.body.aid == "undefined") {
 					News_comment.find({
 						nid: req.body.nid
 					}).then((found) => {
