@@ -1,6 +1,7 @@
 var fetch = require('node-fetch')
 var FormData = require('form-data')
 var he = require("he")
+const SAILS_HOST = "http://localhost:1337"
 // process.on('unhandledRejection', (reason, p) => {
 //   console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
 //   // application specific logging, throwing an error, or other logic here
@@ -214,7 +215,7 @@ module.exports = {
 		}).then(function (user) {
 			form.append('uname', user.name);
 
-			fetch('http://localhost:1337/comments/create', {method: "POST", body: form})
+			fetch(SAILS_HOST+'/comments/create', {method: "POST", body: form})
 			.then(res => res.json())
 	    	.then(json => {
 	    		// sails.sockets.broadcast("tt_room", "hello", {status: 1, data: {c: json.data[0].content, u: user.name, r: json.data[0].comment_id, m: 0}}, req)
