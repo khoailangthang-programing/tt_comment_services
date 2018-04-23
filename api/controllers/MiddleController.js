@@ -62,9 +62,8 @@ module.exports = {
 				for(let i = 0; i < allComment.length; i ++) {
 					sails.sockets.join(req, allComment[i].toString())
 				}
-				return res.json(200, "This request has been joined all related rooms")
+				return res.json(200, {message: "This request has been joined all related rooms", rooms: allComment})
 			}).catch(err => {
-				console.log("no room to care")
 				throw err
 			})
 		}
@@ -220,7 +219,6 @@ module.exports = {
 	    	.then(json => {
 	    		// sails.sockets.broadcast("tt_room", "hello", {status: 1, data: {c: json.data[0].content, u: user.name, r: json.data[0].comment_id, m: 0}}, req)
 	    		if (req.body.reply_to != 0) {
-	    			sails.sockets.join(req, req.body.reply_to.toString());
 	    			// below broadcast used to notify to specific sockets which are related to this reply
 	    			// sails.sockets.broadcast("" + req.body.reply_to, "reply", {status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, reply: parseInt(req.body.reply_to), time: json.data[0].time, m:1}}, req);
 	    			if(req.body.aid && typeof req.body.nid == "undefined") {
@@ -229,7 +227,9 @@ module.exports = {
 	    			else if(req.body.nid && typeof req.body.aid == "undefined"){
 	    				sails.sockets.broadcast("tt_room_"+req.body.nid, "reply", {status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, reply: parseInt(req.body.reply_to), time: json.data[0].time, m:1}}, req);
 	    			}
-	    			res.json({status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, reply: parseInt(req.body.reply_to), time: json.data[0].time}});
+	    			sails.sockets.broadcast(req.body.reply_to.toString(), "notification_reply", {status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, reply: parseInt(req.body.reply_to), time: json.data[0].time, m:1}}, req);
+	    			sails.sockets.join(req, req.body.reply_to.toString());
+	    			return res.json({status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, reply: parseInt(req.body.reply_to), time: json.data[0].time}});
 	    		}
 	    		else {
 	    			sails.sockets.join(req, json.data[0].comment_id.toString());
@@ -239,7 +239,9 @@ module.exports = {
 	    			else if(req.body.nid && typeof req.body.aid == "undefined") {
 	    				sails.sockets.broadcast("tt_room_"+req.body.nid, "comment", {status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, time: json.data[0].time, m: 0}}, req);
 	    			}
-	    			res.json({status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, time: json.data[0].time}});
+	    			sails.sockets.broadcast(json.data[0].comment_id.toString(), "notification_comment", {status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, reply: parseInt(req.body.reply_to), time: json.data[0].time, m:1}}, req);
+	    			sails.sockets.join(req, json.data[0].comment_id.toString());
+	    			return res.json({status: 1, data: {content: json.data[0].content, uname: user.name, uid: user.uid, cid: json.data[0].comment_id, time: json.data[0].time}});
 	    		}
 	    	})
 	    	.catch(function (err) {
