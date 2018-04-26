@@ -1,9 +1,12 @@
 module.exports.policies = {
-  '*': true,
+  '*': false,
   CommentsController: {
   	'create': 'isAuthenticate',
   	'update': 'isAuthenticate',
   	'list': true,
   	'commentCache': true
+  },
+  EmojiController: {
+  	'list': true
   }
 };

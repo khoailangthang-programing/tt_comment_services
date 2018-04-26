@@ -2,5 +2,5 @@ module.exports = {
   models: {
     connection: ['mysqlThapThanhCorePro', 'mysqlThapThanhIdsPro', 'mysqlTamTayIdsPro']
   },
-  port: 80,
+  port: 1337,
 };
